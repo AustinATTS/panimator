@@ -1,0 +1,11 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    background-color: #eff1f5; /* Catppuccin Latte base */
+    padding-top: 100px; /* Space it out a little bit */
+}
+canvas {
+    display: block;
+    margin: auto;
+    background-color: #dce0e8; /* Catppuccin Latte Crust */
+}
