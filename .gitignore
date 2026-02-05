@@ -1,5 +1,4 @@
-*.txt
-*.jpg
 /.idea
 /bazel-*
 /apps/pipeline
+/cmake-build-debug
