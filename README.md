@@ -1,77 +1,123 @@
 # Panimator
 
-converts a video into a whole bunch of text files, then animates them on the web.
+Panimator converts a video into a sequence of text-based frame files and then animates those frames in a web browser.
+
+**Example output:**
+[example_1.mp4](https://github.com/AustinATTS/panimator/blob/master/assets/videos/example_1.mp4)
 
 ## Requirements
 
-- Bazel (Version 9.0.0 but Bazelisk is preferred)
-- ascii-image-converter (available on the aur and other stuff)
+* **Bazel** (tested with 9.0.0; Bazelisk is recommended)
+* **ascii-image-converter** (available on the AUR and other package managers)
 
 ## Usage
 
-### Build the Pipeline
+### Build the pipeline
 
-`bazel build //apps/pipeline:pipeline_runner`
+To build the full pipeline entry point:
 
-This will handle the building and running of all other dependancies however they can all be built manually if needed.
+```sh
+bazel build //apps/pipeline:pipeline_runner
+```
 
-`bazel build //...`
+This target pulls in and builds all required dependencies.
+To build everything manually:
 
-The individual targets available are
+```sh
+bazel build //...
+```
 
-- //apps/pipeline:pipeline_runner
-- //apps/data_parser:parser_lib
-- //apps/data_parser:parser_tool
-- //apps/video_processor:converter_lib
-- //apps/video_processor:video_tool
-- //web:server
+### Available Bazel targets
 
-### Generate files
+* `//apps/pipeline:pipeline_runner`
+* `//apps/data_parser:parser_lib`
+* `//apps/data_parser:parser_tool`
+* `//apps/video_processor:converter_lib`
+* `//apps/video_processor:video_tool`
+* `//web:server`
 
-A set of files is provided as an example in the repo (from Bad Apple!!) however to generate your own text files from a video you can either use its own tool, or the pipeline
+## Generating frame files
 
-The executate files from bazel can be found in the `bazel-bin` directory
+The repository includes a pre-generated example (from *Bad Apple!!*). To generate your own text frames from a video, you can either run the full pipeline or invoke the video processor directly.
 
-`./bazel-bin/apps/pipeline/pipeline_runner --build-files`
+Bazel-built executables are located in the `bazel-bin` directory.
 
-or if using the video_tool on its own
+### Using the pipeline
 
-`./bazel-bin/apps/video_processor/video_tool`
-`bazel run //apps/video_processor:video_tool`
+```sh
+./bazel-bin/apps/pipeline/pipeline_runner --build-files
+```
 
-#### Flags
+### Using the video processor directly
 
-The following flags are available
+```sh
+./bazel-bin/apps/video_processor/video_tool
+```
 
-- `--fps N` (The frames per second for the video converter. Defaults to 30)
-- `--video PATH` (A custom path to the video file. Not yet implemented fully)
+or via Bazel:
 
+```sh
+bazel run //apps/video_processor:video_tool
+```
 
-### Starting the web server
+### Video processor flags
 
-The animation gets displayed on a web server that is set up with a basic python server. You can run this using python itself, or by running it with bazel. It will also be automatically started when you run the pipeline.
+* `--fps N`
+  Frames per second for video conversion. Defaults to 30.
 
-- `bazel run //web:server`
-- `python web/server.py`
-- `./bazel-bin/apps/pipeline/pipeline_runner`
+* `--video PATH`
+  Path to a custom video file. Partially implemented.
 
-### Parsing the text files
+## Running the web server
 
-To parse the text files you can either use the pipeline which will do it for you , or individually through its executable or bazel script.
+The animation is displayed via a simple Python-based web server. It can be started manually or through Bazel, and it will also start automatically when running the pipeline.
 
-`./bazel-bin/apps/pipeline/pipeline_runner`
+Available options:
 
-or
+```sh
+bazel run //web:server
+```
 
-`./bazel-bin/apps/data_parser/parser_tool`
-`bazel run //apps/data_parser:parser_tool`
+```sh
+python web/server.py
+```
 
-#### Flags (Not really implemented)
+```sh
+./bazel-bin/apps/pipeline/pipeline_runner
+```
 
-The following flags are available
+## Parsing text files
 
-- `--fps N` (The frames per second for the data parser. Currently not implemented so defaults to about 30 (33 to account for delays))
-- `--colour COLOUR` (The colour for the circles either as a valid css colour, or hex code)
-- `--delay N` (The time for dealy in milliseconds)
-- `--radius N` (The radius for the circles)
-- `--output PATH` (To define a custom output path)
+Text frames can be parsed either as part of the pipeline or by running the parser directly.
+
+### Using the pipeline
+
+```sh
+./bazel-bin/apps/pipeline/pipeline_runner
+```
+
+### Using the parser directly
+
+```sh
+./bazel-bin/apps/data_parser/parser_tool
+```
+
+or via Bazel:
+
+```sh
+bazel run //apps/data_parser:parser_tool
+```
+
+### Parser flags (partially implemented)
+
+* `--fps N`
+  Frames per second for parsing. Currently defaults to ~30 (33ms per frame).
+
+* `--colour COLOUR`
+  Circle colour (CSS colour name or hex code).
+
+* `--delay N`
+  Frame delay in milliseconds.
+
+* `--radius N`
+  Radius of rendered
