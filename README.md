@@ -2,8 +2,12 @@
 
 Panimator converts a video into a sequence of text-based frame files and then animates those frames in a web browser.
 
-**Example output:**
-[example_1.mp4](https://github.com/AustinATTS/panimator/blob/master/assets/videos/example_1.mp4)
+## Example output:
+
+<video controls autoplay loop muted>
+  <source src="assets/videos/example_1.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 ## Requirements
 
