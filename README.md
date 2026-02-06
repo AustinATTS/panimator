@@ -5,7 +5,7 @@ Panimator converts a video into a sequence of text-based frame files and then an
 ## Example output:
 
 <video controls autoplay loop muted>
-  <source src="assets/videos/example_1.mp4" type="video/mp4">
+  <source src="https://github.com/AustinATTS/panimator/assets/videos/example_1.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
