@@ -33,7 +33,6 @@ Example:
     << std::endl;
 }
 
-
 void Die (const std::string& message) {
     std::cerr << message << std::endl;
     std::exit(1);
