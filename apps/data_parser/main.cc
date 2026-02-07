@@ -6,35 +6,59 @@
 #include <chrono>
 #include <algorithm>
 
+void PrintHelp () {
+    std::cout <<
+R"(parser_tool – Panimator
+
+Usage:
+  parser_tool [options]
+
+Options:
+  --help                 Show this help and exit
+  --fps <number>         Frames per second override
+  --colour <hex|name>    Circle colour override
+  --delay <number>       Circle delay override
+  --radius <number>      Circle radius override
+
+Example:
+  parser_tool --fps 30
+)"
+    << std::endl;
+}
+
 namespace filesystem = std::filesystem;
 namespace parser = ::parser;
 
-int main (int argc, char* argv[]) {
+int main (int argument_count, char* argument_vector[]) {
     std::string output_file = "web/circles.json";
     int frame_delay_ms = 33;
     int radius = 0;
     std::string colour = "#4c4f69";
 
-    for (int i = 1; i < argc; ++i) {
-        std::string arg = argv[i];
-        if (arg == "-o" && i + 1 < argc) {
-            output_file = argv[++i];
+    for (int i = 1; i < argument_count; ++i) {
+        std::string arg = argument_vector[i];
+        if (arg == "--help") {
+            PrintHelp();
+            return 0;
+        }
+        if (arg == "--fps" && i + 1 < argument_count) {
+            output_file = argument_vector[++i];
         }
         else {
-            if (arg == "-d" && i + 1 < argc) {
-                frame_delay_ms = std::stoi(argv[++i]);
+            if (arg == "--delay" && i + 1 < argument_count) {
+                frame_delay_ms = std::stoi(argument_vector[++i]);
             }
             else {
-                if (arg == "-r" && i + 1 < argc) {
-                    radius = std::stoi(argv[++i]);
+                if (arg == "--radius" && i + 1 < argument_count) {
+                    radius = std::stoi(argument_vector[++i]);
                 }
                 else {
-                    if (arg == "-c" && i + 1 < argc) {
-                        colour = argv[++i];
+                    if (arg == "--colour" && i + 1 < argument_count) {
+                        colour = argument_vector[++i];
                     }
                     else {
-                        std::cerr << "Usage: " << argv[0] << " [-o output.json] [-d delay_ms] [-r radius] [-c colour]\n";
-                        return 1;
+                        PrintHelp();
+                        return 0;
                     }
                 }
             }
