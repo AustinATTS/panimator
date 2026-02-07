@@ -4,10 +4,10 @@
 
 #include "converter.h"
 
-#include <filesystem>   // Path resolution and existence checks
-#include <iostream>     // Console output
-#include <stdexcept>    // Exception handling
-#include <string>       // Argument storage
+#include <filesystem>   // Path resolution and existence checks.
+#include <iostream>     // Console output.
+#include <stdexcept>    // Exception handling.
+#include <string>       // Argument storage.
 
 // Prints CLI usage information and exits.
 void PrintHelp () {
