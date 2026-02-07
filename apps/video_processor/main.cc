@@ -45,7 +45,7 @@ int main (int argc, char* argv[]) {
         filesystem::path ascii_directory  = "data/txt_files";
 
         std::cout
-            << "Bad Apple pipeline\n"
+            << "Panimator pipeline\n"
             << "  Video : " << video << "\n"
             << "  Frames: " << frames_directory << "\n"
             << "  ASCII : " << ascii_directory << "\n"
