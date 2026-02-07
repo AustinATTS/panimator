@@ -22,7 +22,6 @@ Options:
   --video <path>         Input video file (used with --build-files)
   --fps <number>         Frames per second override
   --colour <hex|name>    Circle colour override
-  --delay <number>       Circle delay override
   --radius <number>      Circle radius override
 
 Example:
@@ -94,17 +93,12 @@ int main (int argument_count, char** argument_vector) {
                             colour = argument_vector[++i];
                         }
                         else {
-                            if (argument == "--delay" && i + 1 < argument_count) {
-                                delay = argument_vector[++i];
+                            if (argument == "--radius" && i + 1 < argument_count) {
+                                radius = argument_vector[++i];
                             }
                             else {
-                                if (argument == "--radius" && i + 1 < argument_count) {
-                                    radius = argument_vector[++i];
-                                }
-                                else {
-                                    PrintHelp();
-                                    return 0;
-                                }
+                                PrintHelp();
+                                return 0;
                             }
                         }
                     }
@@ -158,10 +152,6 @@ int main (int argument_count, char** argument_vector) {
     if (!radius.empty()) {
         parser.push_back("--radius");
         parser.push_back(radius);
-    }
-    if (!delay.empty()) {
-        parser.push_back("--delay");
-        parser.push_back(delay);
     }
     pid_t parserPid = Spawn(parser);
 

@@ -17,7 +17,6 @@ Options:
   --help                 Show this help and exit
   --fps <number>         Frames per second override
   --colour <hex|name>    Circle colour override
-  --delay <number>       Circle delay override
   --radius <number>      Circle radius override
 
 Example:
@@ -31,7 +30,7 @@ namespace parser = ::parser;
 
 int main (int argument_count, char* argument_vector[]) {
     std::string output_file = "web/circles.json";
-    int frame_delay_ms = 33;
+    int frames_per_second = 30;
     int radius = 0;
     std::string colour = "#4c4f69";
 
@@ -45,21 +44,16 @@ int main (int argument_count, char* argument_vector[]) {
             output_file = argument_vector[++i];
         }
         else {
-            if (arg == "--delay" && i + 1 < argument_count) {
-                frame_delay_ms = std::stoi(argument_vector[++i]);
+            if (arg == "--radius" && i + 1 < argument_count) {
+                radius = std::stoi(argument_vector[++i]);
             }
             else {
-                if (arg == "--radius" && i + 1 < argument_count) {
-                    radius = std::stoi(argument_vector[++i]);
+                if (arg == "--colour" && i + 1 < argument_count) {
+                    colour = argument_vector[++i];
                 }
                 else {
-                    if (arg == "--colour" && i + 1 < argument_count) {
-                        colour = argument_vector[++i];
-                    }
-                    else {
-                        PrintHelp();
-                        return 0;
-                    }
+                    PrintHelp();
+                    return 0;
                 }
             }
         }
@@ -87,6 +81,7 @@ int main (int argument_count, char* argument_vector[]) {
 
     std::cout << "Loaded " << files.size() << " frames\n";
 
+    int frame_delay_ms = 1000 / frames_per_second;
     while (true) {
         for (const auto& file : files) {
             auto circles = parser::ParseFrame(file, radius, colour);

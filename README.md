@@ -120,8 +120,5 @@ bazel run //apps/data_parser:parser_tool
 * `--colour COLOUR`
   Circle colour (CSS colour name or hex code).
 
-* `--delay N`
-  Frame delay in milliseconds.
-
 * `--radius N`
   Radius of rendered
