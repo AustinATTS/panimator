@@ -35,20 +35,20 @@ int main (int argument_count, char* argument_vector[]) {
     std::string colour = "#4c4f69";
 
     for (int i = 1; i < argument_count; ++i) {
-        std::string arg = argument_vector[i];
-        if (arg == "--help") {
+        std::string argument = argument_vector[i];
+        if (argument == "--help") {
             PrintHelp();
             return 0;
         }
-        if (arg == "--fps" && i + 1 < argument_count) {
+        if (argument == "--fps" && i + 1 < argument_count) {
             output_file = argument_vector[++i];
         }
         else {
-            if (arg == "--radius" && i + 1 < argument_count) {
+            if (argument == "--radius" && i + 1 < argument_count) {
                 radius = std::stoi(argument_vector[++i]);
             }
             else {
-                if (arg == "--colour" && i + 1 < argument_count) {
+                if (argument == "--colour" && i + 1 < argument_count) {
                     colour = argument_vector[++i];
                 }
                 else {
@@ -69,8 +69,8 @@ int main (int argument_count, char* argument_vector[]) {
     }
 
     std::vector<filesystem::path> files;
-    for (auto& e : filesystem::directory_iterator(txt_dir)) {
-        if (e.is_regular_file()) files.push_back(e.path());
+    for (auto& entry : filesystem::directory_iterator(txt_dir)) {
+        if (entry.is_regular_file()) files.push_back(entry.path());
     }
 
     std::sort(files.begin(), files.end());
