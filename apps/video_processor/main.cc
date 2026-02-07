@@ -6,6 +6,10 @@
 #include <stdexcept>
 #include <string>
 
+void PrintHelp() {
+    std::cout << "GE" << std::endl;
+}
+
 namespace filesystem = std::filesystem;
 
 filesystem::path FindVideoViaExecutable (char* argv0) {
@@ -25,33 +29,53 @@ filesystem::path FindVideoViaExecutable (char* argv0) {
     return runfiles;
 }
 
-int main (int argc, char* argv[]) {
+int main (int argument_count, char* argument_vector[]) {
     int frames_per_second = 30;
+    std::string video;
 
-    for (int i = 1; i < argc; ++i) {
-        std::string arguments = argv[i];
-        if (arguments == "--fps" && i + 1 < argc) {
-            frames_per_second = std::stoi(argv[++i]);
+    for (int i = 1; i < argument_count; ++i) {
+        std::string argument = argument_vector[i];
+        if (argument == "--help") {
+            PrintHelp();
+            return 0;
+        }
+        if (argument == "--fps" && i + 1 < argument_count) {
+            frames_per_second = std::stoi(argument_vector[++i]);
         } else {
-            std::cerr << "Usage: bazel run //apps/video_processor:video_tool -- [--fps N]\n";
-            return 1;
+            if (argument == "--video" && i + 1 < argument_count) {
+                video = argument_vector[++i];
+            }
+            else {
+                PrintHelp();
+                return 0;
+            }
         }
     }
 
     try {
-        filesystem::path video = FindVideoViaExecutable(argv[0]);
+        filesystem::path video_path;
+        if (!video.empty()) {
+            video_path = filesystem::path(video);
+            if (!filesystem::exists(video_path)) {
+                throw std::runtime_error("Video not found: " + video_path.string());
+            }
+            video_path = filesystem::canonical(video_path);
+        }
+        else {
+            video_path = FindVideoViaExecutable(argument_vector[0]);
+        }
 
         filesystem::path frames_directory = "data/frames";
         filesystem::path ascii_directory  = "data/txt_files";
 
         std::cout
             << "Panimator pipeline\n"
-            << "  Video : " << video << "\n"
+            << "  Video : " << video_path << "\n"
             << "  Frames: " << frames_directory << "\n"
             << "  ASCII : " << ascii_directory << "\n"
             << "  FPS   : " << frames_per_second << "\n";
 
-        if (!video::ProcessVideo(video, frames_directory, ascii_directory, frames_per_second)) {
+        if (!video::ProcessVideo(video_path, frames_directory, ascii_directory, frames_per_second)) {
             std::cerr << "Pipeline failed\n";
             return 1;
         }
