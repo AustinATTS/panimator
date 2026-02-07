@@ -1,6 +1,5 @@
 // TODO(Austin): Add comments.
 #include "converter.h"
-
 #include <filesystem>
 #include <iostream>
 #include <stdexcept>
@@ -90,11 +89,11 @@ int main (int argument_count, char* argument_vector[]) {
             << "  FPS   : " << frames_per_second << "\n";
 
         if (!video::ProcessVideo(video_path, frames_directory, ascii_directory, frames_per_second)) {
-            std::cerr << "Pipeline failed\n";
+            std::cerr << "Video Processor failed\n";
             return 1;
         }
 
-        std::cout << "Pipeline complete\n";
+        std::cout << "Video Processor complete\n";
         return 0;
     }
     catch (const std::exception& error) {
