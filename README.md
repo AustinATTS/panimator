@@ -1,8 +1,14 @@
 # Panimator
 
-Panimator converts a video into a sequence of text-based frame files and then animates those frames in a web browser.
+Panimator converts a video into a sequence of ASCII text frames and animates those frames in a web browser by translating characters into rendered primitives.
 
-## Example output:
+The pipeline is split into three main stages:
+
+1. **Video processing** - extract frames and convert them to ASCII
+2. **Parsing** - translate ASCII frames into JSON animation data
+3. **Rendering** - stream frames to a browser via a lightweight web server
+
+## Example output
 
 <video controls autoplay loop muted>
   <source src="https://github.com/AustinATTS/panimator/assets/videos/example_1.mp4" type="video/mp4">
@@ -11,21 +17,22 @@ Panimator converts a video into a sequence of text-based frame files and then an
 
 ## Requirements
 
-* **Bazel** (tested with 9.0.0; Bazelisk is recommended)
+* **Bazel** (tested with 9.0.0; Bazelisk recommended)
+* **ffmpeg** (for frame extraction)
 * **ascii-image-converter** (available on the AUR and other package managers)
+* **Python 3** (for the web server)
 
-## Usage
+## Building
 
-### Build the pipeline
-
-To build the full pipeline entry point:
+### Build the full pipeline entry point
 
 ```sh
 bazel build //apps/pipeline:pipeline_runner
 ```
 
-This target pulls in and builds all required dependencies.
-To build everything manually:
+This target pulls in and builds all required components.
+
+### Build everything
 
 ```sh
 bazel build //...
@@ -33,26 +40,74 @@ bazel build //...
 
 ### Available Bazel targets
 
+#### Pipeline
+
 * `//apps/pipeline:pipeline_runner`
-* `//apps/data_parser:parser_lib`
-* `//apps/data_parser:parser_tool`
+
+#### Video processing
+
 * `//apps/video_processor:converter_lib`
 * `//apps/video_processor:video_tool`
+
+#### Parsing
+
+* `//apps/data_parser:parser_lib`
+* `//apps/data_parser:parser_tool`
+
+#### Web
+
 * `//web:server`
 
-## Generating frame files
+Build executables are placed under `bazel-bin/`.
 
-The repository includes a pre-generated example (from *Bad Apple!!*). To generate your own text frames from a video, you can either run the full pipeline or invoke the video processor directly.
+## Running the full pipeline
 
-Bazel-built executables are located in the `bazel-bin` directory.
+The pipeline runner coordinates:
 
-### Using the pipeline
+- Optional video conversion
+- Starting the web server
+- Running the parser loop
 
 ```sh
-./bazel-bin/apps/pipeline/pipeline_runner --build-files
+./bazel-bin/apps/pipeline/pipeline_runner
 ```
 
-### Using the video processor directly
+### Pipeline flags
+
+- `--build-files`
+  Extract frames and generate ASCII files before starting the pipeline.
+- `--video PATH`
+  Input video file for conversion (used with `--build-files`).
+- `--fps N`
+  Frames per second override.
+- `--colour COLOUR`
+  Circle colour (CSS colour name or hex code).
+- `--radius N`
+  Radius of rendered circles.
+- `--verbose`
+  Enable HTTP reequest logging in the web server.
+
+#### Example:
+
+```sh
+./bazel-bin/apps/pipeline/pipeline_runner \
+  --build-files \
+  --video badapple.mp4 \
+  --fps 30 \
+  --colour #4c4f69 \
+  --radius 1
+```
+
+## Video Processing
+
+The video processor converts a video into ASCII text frames.
+
+It performs two steps:
+
+1. Extracts frames using `ffmpeg`
+2. Converts frames to ASCII using `ascii-image-converter`
+
+### Run directly
 
 ```sh
 ./bazel-bin/apps/video_processor/video_tool
@@ -67,40 +122,27 @@ bazel run //apps/video_processor:video_tool
 ### Video processor flags
 
 * `--fps N`
-  Frames per second for video conversion. Defaults to 30.
+  Frames per second for conversion (Default: 30).
 
 * `--video PATH`
-  Path to a custom video file. Partially implemented.
+  Path to a custom video file.
 
-## Running the web server
+#### Output Directories:
 
-The animation is displayed via a simple Python-based web server. It can be started manually or through Bazel, and it will also start automatically when running the pipeline.
+- Extracted frames: `data/frames/`
+- ASCII frames: `data/txt_files/`
 
-Available options:
+## Parsing ASCII frames
 
-```sh
-bazel run //web:server
-```
+The parser converts ASCII frames into JSON circle data that the web renderer consumes.
 
-```sh
-python web/server.py
-```
+### Run via pipeline
 
 ```sh
 ./bazel-bin/apps/pipeline/pipeline_runner
 ```
 
-## Parsing text files
-
-Text frames can be parsed either as part of the pipeline or by running the parser directly.
-
-### Using the pipeline
-
-```sh
-./bazel-bin/apps/pipeline/pipeline_runner
-```
-
-### Using the parser directly
+### Run directly
 
 ```sh
 ./bazel-bin/apps/data_parser/parser_tool
@@ -115,10 +157,57 @@ bazel run //apps/data_parser:parser_tool
 ### Parser flags
 
 * `--fps N`
-  Frames per second for parsing. Currently defaults to ~30 (33ms per frame).
+  Playback rate for parsed frames.
 
 * `--colour COLOUR`
   Circle colour (CSS colour name or hex code).
 
 * `--radius N`
-  Radius of rendered
+  Radius applied to each rendered circle.
+
+Parsed output is written continuously to:
+
+`web/circles.json`
+
+
+## Web server
+
+The animation is displayed in a browser via a simple Python HTTP server.
+
+It serves static files from the `web/` directory and streams live updates.
+
+### Run manually
+
+```python
+python web/server.py
+```
+
+### Run via Bazel
+
+```sh
+bazel run //web:server
+```
+
+### Run via pipeline
+
+The server starts automatically when using `pipeline_runner`.
+
+### Verbose logging
+
+Enable request logging by setting:
+
+```python
+VERBOSE=1
+```
+
+or by using the pipeline flag:
+
+```sh
+--verbose
+```
+
+## Notes
+
+- ASCII frame dimensions are currently fixed in the converter.
+- JSON output is rewritten every frame to support live animation.
+- The pipeline is designed for simplicity over throughput.

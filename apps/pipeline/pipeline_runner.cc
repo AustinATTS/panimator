@@ -22,7 +22,7 @@ Usage:
 Options:
   --help                 Show this help and exit
   --build-files          Build video files before starting pipeline
-  --verbose-server       Enable HTTP request logging for the web server
+  --verbose              Enable HTTP request logging for the web server
   --video <path>         Input video file (used with --build-files)
   --fps <number>         Frames per second override
   --colour <hex|name>    Circle colour override
