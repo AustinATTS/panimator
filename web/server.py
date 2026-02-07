@@ -8,10 +8,17 @@ PORT = 8000
 web_dir = os.path.abspath(os.path.dirname(__file__))
 os.chdir(web_dir)
 
+VERBOSE = os.getenv("VERBOSE") == "1"
+
+class QuietHTTPRequestHandler(SimpleHTTPRequestHandler):
+    def log_message(self, format, *arguments):
+        pass
+
+Handler = SimpleHTTPRequestHandler if VERBOSE else QuietHTTPRequestHandler
+
 class ReusableTCPServer(TCPServer):
     allow_reuse_address = True
 
-Handler = SimpleHTTPRequestHandler
 httpd = None
 
 try:
@@ -19,10 +26,13 @@ try:
     print(f"Serving web at http://localhost:{PORT}")
     print("Press Ctrl+C to stop the server.")
     httpd.serve_forever()
+
 except KeyboardInterrupt:
     print("\nShutting down server...")
-except OSError as e:
-    print(f"Failed to start server: {e}")
+
+except OSError as error:
+    print(f"Failed to start server: {error}")
+
 finally:
     if httpd:
         httpd.server_close()

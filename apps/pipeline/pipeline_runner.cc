@@ -7,25 +7,29 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <fcntl.h>
 
-void die (const std::string& msg) {
-    std::cerr << msg << std::endl;
+void Die (const std::string& message) {
+    std::cerr << message << std::endl;
     std::exit(1);
 }
 
-void build (const std::string& target) {
-    std::string cmd = "bazel build " + target;
-    if (std::system(cmd.c_str()) != 0) {
-        die("Build failed: " + target);
+void Build (const std::string& target) {
+    std::string command = "bazel build " + target;
+    if (std::system(command.c_str()) != 0) {
+        Die("Build failed: " + target);
     }
 }
 
-pid_t spawn (const std::vector<std::string>& args) {
+pid_t Spawn (const std::vector<std::string>& arguments, bool verbose = false) {
     pid_t pid = fork();
     if (pid == 0) {
+        if (verbose) {
+            setenv("VERBOSE", "1", 1);
+        }
         std::vector<char*> cargs;
-        for (const auto& s : args) {
-            cargs.push_back(const_cast<char*>(s.c_str()));
+        for (const auto& argument : arguments) {
+            cargs.push_back(const_cast<char*>(argument.c_str()));
         }
         cargs.push_back(nullptr);
 
@@ -35,57 +39,65 @@ pid_t spawn (const std::vector<std::string>& args) {
     return pid;
 }
 
-int main (int argc, char** argv) {
-    bool buildFiles = false;
+int main (int argument_count, char** argument_vector) {
+    bool build_files = false;
+    bool verbose = false;
     std::string video, fps, colour;
 
-    for (int i = 1; i < argc; i++) {
-        std::string arg = argv[i];
-        if (arg == "--build-files") {
-            buildFiles = true;
+    for (int i = 1; i < argument_count; i++) {
+        std::string argument;
+        argument = argument_vector[i];
+        if (argument == "--build-files") {
+            build_files = true;
+            Build("//apps/video_processor:video_tool");
         }
         else {
-            if (arg == "--video" && i + 1 < argc) {
-                video = argv[++i];
+            if (argument == "--verbose") {
+                verbose = true;
             }
             else {
-                if (arg == "--fps" && i + 1 < argc) {
-                    fps = argv[++i];
+                if (argument == "--video" && i + 1 < argument_count) {
+                    video = argument_vector[++i];
                 }
                 else {
-                    if (arg == "--colour" && i + 1 < argc) {
-                        colour = argv[++i];
+                    if (argument == "--fps" && i + 1 < argument_count) {
+                        fps = argument_vector[++i];
+                    }
+                    else {
+                        if (argument == "--colour" && i + 1 < argument_count) {
+                            colour = argument_vector[++i];
+                        }
                     }
                 }
             }
         }
     }
 
-    build("//web:server");
-    build("//apps/data_parser:parser_tool");
+    Build("//web:server");
+    Build("//apps/data_parser:parser_tool");
 
-    if (buildFiles) {
-        build("//apps/video_processor:video_tool");
-    }
-
-    pid_t server = spawn({
+    pid_t server = Spawn({
         "bazel-bin/web/server"
-    });
+    }, verbose);
 
-    if (buildFiles) {
-        std::vector<std::string> gen = {
+    sleep(1);
+
+    if (build_files) {
+        std::vector<std::string> converter = {
             "bazel-bin/apps/video_processor/video_tool"
         };
         if (!video.empty()) {
-            gen.push_back("--video=" + video);
+            converter.push_back("--video=" + video);
         }
         if (!fps.empty()) {
-            gen.push_back("--fps=" + fps);
+            converter.push_back("--fps=" + fps);
         }
-        spawn(gen);
+        Spawn(converter);
     }
 
-    std::vector<std::string> parser = {"bazel-bin/apps/data_parser/parser_tool"};
+    std::vector<std::string> parser = {
+        "bazel-bin/apps/data_parser/parser_tool"
+    };
     if (!fps.empty()) {
         parser.push_back("--fps=" + fps);
     }
@@ -93,7 +105,7 @@ int main (int argc, char** argv) {
         parser.push_back("--colour=" + colour);
     }
 
-    pid_t parserPid = spawn(parser);
+    pid_t parserPid = Spawn(parser);
 
     int status;
     waitpid(server, &status, 0);
