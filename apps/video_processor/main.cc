@@ -6,8 +6,22 @@
 #include <stdexcept>
 #include <string>
 
-void PrintHelp() {
-    std::cout << "GE" << std::endl;
+void PrintHelp () {
+    std::cout <<
+R"(video_tool – Panimator
+
+Usage:
+  video_tool [options]
+
+Options:
+  --help                 Show this help and exit
+  --video <path>         Input video file (used with --build-files)
+  --fps <number>         Frames per second override
+
+Example:
+  video_tool --video badapple.mp4 --fps 30
+)"
+    << std::endl;
 }
 
 namespace filesystem = std::filesystem;
@@ -69,7 +83,7 @@ int main (int argument_count, char* argument_vector[]) {
         filesystem::path ascii_directory  = "data/txt_files";
 
         std::cout
-            << "Panimator pipeline\n"
+            << "Panimator Video Processor\n"
             << "  Video : " << video_path << "\n"
             << "  Frames: " << frames_directory << "\n"
             << "  ASCII : " << ascii_directory << "\n"
