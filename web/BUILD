@@ -23,6 +23,6 @@ py_binary(
     name = "server",
     srcs = ["server.py"],
     data = [":web_assets"],
-    tags = ["no-sandbox"],  # TODO(Austin): Write an overall build sequence so it can be sandboxed together.
+    tags = ["no-sandbox"],
     visibility = ["//visibility:public"],
 )

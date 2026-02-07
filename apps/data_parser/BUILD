@@ -15,7 +15,7 @@ cc_binary(
         "//data:ascii_frames",  # Requires all the text files to read from.
         "//web:circles_json",  # as well as the json file to write to.
     ],
-    tags = ["no-sandbox"],  # TODO(Austin): Write an overall build sequence so it can be sandboxed together.
+    tags = ["no-sandbox"],
     visibility = ["//visibility:public"],
     deps = [":parser_lib"],  # Depends on the parser library.
 )

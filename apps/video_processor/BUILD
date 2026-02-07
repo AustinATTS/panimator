@@ -12,7 +12,7 @@ cc_binary(
     name = "video_tool",
     srcs = ["main.cc"],
     data = ["//data:video"],  # Requires the video.
-    tags = ["no-sandbox"],  # TODO(Austin): Write an overall build sequence so it can be sandboxed together.
+    tags = ["no-sandbox"],
     visibility = ["//visibility:public"],
     deps = [":converter_lib"],  # Depends on the converter library.
 )

@@ -1,7 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
 # Video file, single source.
-# TODO(Austin): Add better checking so the file doesnt necessarily need to be called video.
 filegroup(
     name = "video",
     srcs = ["video.mp4"],

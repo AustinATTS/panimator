@@ -112,7 +112,7 @@ or via Bazel:
 bazel run //apps/data_parser:parser_tool
 ```
 
-### Parser flags (partially implemented)
+### Parser flags
 
 * `--fps N`
   Frames per second for parsing. Currently defaults to ~30 (33ms per frame).
