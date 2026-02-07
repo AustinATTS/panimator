@@ -67,11 +67,10 @@ pid_t Spawn (const std::vector<std::string>& arguments, bool verbose = false) {
 int main (int argument_count, char** argument_vector) {
     bool build_files = false;
     bool verbose = false;
-    std::string video, fps, colour, delay, radius;
+    std::string video, frames_per_second, colour, delay, radius;
 
     for (int i = 1; i < argument_count; i++) {
-        std::string argument;
-        argument = argument_vector[i];
+        std::string argument = argument_vector[i];
         if (argument == "--help") {
             PrintHelp();
             return 0;
@@ -90,7 +89,7 @@ int main (int argument_count, char** argument_vector) {
                 }
                 else {
                     if (argument == "--fps" && i + 1 < argument_count) {
-                        fps = argument_vector[++i];
+                        frames_per_second = argument_vector[++i];
                     }
                     else {
                         if (argument == "--colour" && i + 1 < argument_count) {
@@ -103,6 +102,10 @@ int main (int argument_count, char** argument_vector) {
                             else {
                                 if (argument == "--radius" && i + 1 < argument_count) {
                                     radius = argument_vector[++i];
+                                }
+                                else {
+                                    PrintHelp();
+                                    return 0;
                                 }
                             }
                         }
@@ -117,10 +120,12 @@ int main (int argument_count, char** argument_vector) {
             "bazel-bin/apps/video_processor/video_tool"
         };
         if (!video.empty()) {
-            converter.push_back("--video=" + video);
+            converter.push_back("--video");
+            converter.push_back(video);
         }
-        if (!fps.empty()) {
-            converter.push_back("--fps=" + fps);
+        if (!frames_per_second.empty()) {
+            converter.push_back("--fps");
+            converter.push_back(frames_per_second);
         }
 
         pid_t converterPid = Spawn(converter);
@@ -144,17 +149,21 @@ int main (int argument_count, char** argument_vector) {
     std::vector<std::string> parser = {
         "bazel-bin/apps/data_parser/parser_tool"
     };
-    if (!fps.empty()) {
-        parser.push_back("--fps=" + fps);
+    if (!frames_per_second.empty()) {
+        parser.push_back("--fps");
+        parser.push_back(frames_per_second);
     }
     if (!colour.empty()) {
-        parser.push_back("--colour=" + colour);
+        parser.push_back("--colour");
+        parser.push_back(colour);
     }
     if (!radius.empty()) {
-        parser.push_back("--radius=" + radius);
+        parser.push_back("--radius");
+        parser.push_back(radius);
     }
     if (!delay.empty()) {
-        parser.push_back("--delay=" + delay);
+        parser.push_back("--delay");
+        parser.push_back(delay);
     }
     pid_t parserPid = Spawn(parser);
 
