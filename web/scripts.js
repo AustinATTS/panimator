@@ -1,7 +1,7 @@
 // Source coordinate system size.
 // All circle positions/radii are defined relative to this grid.
-const SRC_WIDTH = 97;
-const SRC_HEIGHT = 36;
+const SRC_WIDTH = 147;
+const SRC_HEIGHT = 54;
 
 // Canvas + 2D drawing context.
 const canvas = document.getElementById("circleCanvas");
@@ -44,8 +44,8 @@ function render() {
         const path = buckets.get(colour);
 
         // Convert source coordinates into canvas space.
-        const x = c.parameters.x * scale;
-        const y = c.parameters.y * scale;
+        const x = (c.parameters.x + 0.5) * scale;
+        const y = (c.parameters.y + 0.5) * scale;
 
         // Default radius if none is provided.
         const radius = (c.parameters.radius || 0.45) * scale;

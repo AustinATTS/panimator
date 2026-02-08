@@ -1,11 +1,19 @@
-body {
+html, body {
     margin: 0;
-    overflow: hidden;
+    padding: 0;
     background-color: #eff1f5; /* Catppuccin Latte base */
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
     padding-top: 100px; /* Space it out a little bit */
 }
+
 canvas {
     display: block;
-    margin: auto;
     background-color: #dce0e8; /* Catppuccin Latte Crust */
+    width: 882px;
+    height: 324px;
 }
